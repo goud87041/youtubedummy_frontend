@@ -8,6 +8,7 @@ import { toggleSubscribe } from "../services/subscription";
 import { ThumbsUp, Share2, Plus } from "lucide-react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import AddToPlaylistModal from "../components/AddToPlaylistModal";
+import ReactPlayer from "react-player";
 
 export default function VideoPlayer() {
   const { videoId } = useParams();
@@ -138,13 +139,20 @@ export default function VideoPlayer() {
       <div className="lg:col-span-2">
         {/* Video Player */}
         <div className="bg-black rounded-xl overflow-hidden aspect-video">
-          <video
+          <ReactPlayer
+            url={video?.videoFile}
             controls
-            className="w-full h-full"
-            src={video?.videoFile}
-          >
-            Your browser does not support video.
-          </video>
+            width="100%"
+            height="100%"
+            playing={false}
+            config={{
+              file: {
+                attributes: {
+                  controlsList: 'nodownload'
+                }
+              }
+            }}
+          />
         </div>
 
         {/* Video Info */}
