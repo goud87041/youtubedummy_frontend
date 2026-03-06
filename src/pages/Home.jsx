@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { getVideos } from "../services/homeVideos"
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { AuthContext } from "../context/authContext";
 
 
 
@@ -13,6 +14,7 @@ export default function Home() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const searchQuery = searchParams.get("search");
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     setVideos([]);
@@ -42,6 +44,9 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error fetching videos:", error)
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setLoading(false);
     }
