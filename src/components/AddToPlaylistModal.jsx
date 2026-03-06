@@ -22,17 +22,23 @@ export default function AddToPlaylistModal({ videoId, onClose }) {
     try {
       if (isAdded) {
         await removeVideoFromPlayList(videoId, playlistId);
+        setPlaylists(prev =>
+          prev.map(pl =>
+            pl._id === playlistId
+              ? { ...pl, videos: pl.videos.filter(v => v !== videoId) }
+              : pl
+          )
+        );
       } else {
         await addVideoToPlaylist(videoId, playlistId);
+        setPlaylists(prev =>
+          prev.map(pl =>
+            pl._id === playlistId
+              ? { ...pl, videos: [...(pl.videos || []), videoId] }
+              : pl
+          )
+        );
       }
-      
-      setPlaylists(prev =>
-        prev.map(pl =>
-          pl._id === playlistId
-            ? { ...pl, hasVideo: !isAdded }
-            : pl
-        )
-      );
     } catch (error) {
       console.error(error);
     } finally {
@@ -70,8 +76,8 @@ export default function AddToPlaylistModal({ videoId, onClose }) {
                 </div>
                 <input
                   type="checkbox"
-                  checked={playlist.hasVideo || false}
-                  onChange={() => handleTogglePlaylist(playlist._id, playlist.hasVideo)}
+                  checked={playlist.videos?.includes(videoId) || false}
+                  onChange={() => handleTogglePlaylist(playlist._id, playlist.videos?.includes(videoId))}
                   disabled={loading}
                   className="w-5 h-5 cursor-pointer"
                 />
