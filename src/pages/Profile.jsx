@@ -1,6 +1,7 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
+import { updateUserProfile, updateAvatar, changePassword } from "../services/user";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -47,13 +48,26 @@ export default function Profile() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Add your API call here
-      // await updateProfile(formData);
-      console.log("Saving:", formData);
+      await updateUserProfile({
+        fullname: formData.fullname,
+        bio: formData.bio,
+      });
+      
+      // Update context
+      setUser({
+        ...user,
+        user: {
+          ...user.user,
+          fullname: formData.fullname,
+          bio: formData.bio,
+        }
+      });
+      
       alert("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
       alert("Failed to update profile");
+      console.error(error);
     } finally {
       setLoading(false);
     }

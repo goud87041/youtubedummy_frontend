@@ -1,23 +1,32 @@
 import { useEffect, useState } from "react"
 import { getVideos } from "../services/homeVideos"
 import { LuLoader } from "react-icons/lu";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 
 
 export default function Home() {
   const [videos, setVideos] = useState([])
   const [page , setPage ] = useState(1)
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const searchQuery = searchParams.get("search");
 
   useEffect(() => {
-    fetchVideo()
-  }, [page])
+    setVideos([]);
+    setPage(1);
+    fetchVideo();
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchVideo();
+    }
+  }, [page]);
 
   const fetchVideo = async () => {
-    // const re = getVideos(page)
-    // console.log(re);
-    
     try {
-      const res = await getVideos(page)
+      const res = await getVideos(page, 10, searchQuery)
       console.log(res.data.data);
 
       const videoInArray = res.data.data
@@ -49,7 +58,11 @@ export default function Home() {
     <div >
     <div className="grid grid-cols-3 gap-7 bg-gray-200 p-4">
       {videos.map((video,index) => (
-        <div key={video._id + index } className="bg-white cursor-pointer rounded-lg overflow-hidden">
+        <div 
+          key={video._id + index } 
+          className="bg-white cursor-pointer rounded-lg overflow-hidden"
+          onClick={() => navigate(`/video/${video._id}`)}
+        >
           <div className="relative">
             <img
               src={video.thumbnail}

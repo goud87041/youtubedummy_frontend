@@ -8,6 +8,10 @@ export const getAllVideos = ()=>{
     return api.get(`/videos/allVideos`)
 }
 
+export const getVideoById = (videoId)=>{
+    return api.get(`/videos/${videoId}`)
+}
+
 export const deleteVideo = (videoId)=>{
 return api.delete(`/videos/${videoId}`)
 }
@@ -29,5 +33,6 @@ export const updateVideo = (videoId , data)=>{
     })
 }
 
-
-
+export const togglePublishStatus = (videoId) => {
+    return api.patch(`/videos/toggle/publish/${videoId}`);
+}

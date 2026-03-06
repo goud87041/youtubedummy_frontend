@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { getSubscribedChannels } from "../services/getSubscribedChann"
+import { toggleSubscribe } from "../services/subscription"
+import { useNavigate } from "react-router-dom"
 
 export default function SubscribedChannels() {
   const [subscribedChannels, setSubscribedChannels] = useState([])
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchSubscribedChannels = async () => {
@@ -13,8 +16,6 @@ export default function SubscribedChannels() {
         console.log(res.data.data[0]);
         
       } catch (error) {
-        // console.log(res);
-        
         console.error(error)
       } finally {
         setLoading(true)
@@ -24,7 +25,14 @@ export default function SubscribedChannels() {
     fetchSubscribedChannels()
   }, [])
 
-  
+  const handleUnsubscribe = async (channelId) => {
+    try {
+      await toggleSubscribe(channelId);
+      setSubscribedChannels(prev => prev.filter(ch => ch._id !== channelId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (!loading) return <p>Loading...</p>
 
@@ -43,7 +51,7 @@ export default function SubscribedChannels() {
             >
               <div className="flex items-center gap-4">
                 <img
-                  src={item?.avtar}
+                  src={item?.avtar || "https://i.pravatar.cc/40"}
                   alt="avatar"
                   className="w-12 h-12 rounded-full object-cover"
                 />
@@ -54,7 +62,10 @@ export default function SubscribedChannels() {
                 </div>
               </div>
 
-              <button className="px-4 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700">
+              <button 
+                onClick={() => handleUnsubscribe(item.channelId)}
+                className="px-4 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+              >
                 Unsubscribe
               </button>
             </div>

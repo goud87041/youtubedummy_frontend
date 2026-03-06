@@ -4,15 +4,18 @@ import {
   getAllVideos,
   updateVideo,
   uploadVideo,
+  togglePublishStatus,
 } from "../services/video";
 import { likeOnVideo } from "../services/like";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function Videos() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
 
-  const [toggelLike, setToggelLike] = useState(false)
+  const [likedVideos, setLikedVideos] = useState({});
 
   const [myVideos, setMyVideos] = useState([]);
   const [showUpload, setShowUpload] = useState(false);
@@ -33,7 +36,15 @@ export default function Videos() {
   useEffect(() => {
     const fetchVideos = async () => {
       const res = await getAllVideos();
-      setMyVideos(res?.data?.data || []);
+      const videos = res?.data?.data || [];
+      setMyVideos(videos);
+      
+      // Initialize liked state for each video
+      const likedState = {};
+      videos.forEach(video => {
+        likedState[video._id] = video.isLiked || false;
+      });
+      setLikedVideos(likedState);
     };
     fetchVideos();
   }, []);
@@ -86,21 +97,16 @@ export default function Videos() {
     }
   };
 
-  const handleLike = async(e)=>{
-    // e.preventDefault()
-    console.log(e);
+  const handleLike = async(videoId)=>{
     try {
-      const res = await likeOnVideo(e)
-      setToggelLike(res.data?.data.liked)
-      console.log(res.data?.data);
-      console.log(toggelLike);
-      
-      
+      const res = await likeOnVideo(videoId)
+      setLikedVideos(prev => ({
+        ...prev,
+        [videoId]: res.data?.data.liked
+      }));
     } catch (error) {
       console.log(error);
-      
     }
-    
   }
 
   // ================= DELETE =================
@@ -153,6 +159,22 @@ export default function Videos() {
       console.log(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ================= TOGGLE PUBLISH =================
+  const handleTogglePublish = async (videoId) => {
+    try {
+      await togglePublishStatus(videoId);
+      setMyVideos((prev) =>
+        prev.map((video) =>
+          video._id === videoId
+            ? { ...video, isPublished: !video.isPublished }
+            : video
+        )
+      );
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -240,7 +262,7 @@ export default function Videos() {
               key={video._id}
               className="bg-white shadow rounded-xl p-4 flex gap-4"
             >
-              <div className="relative w-56">
+              <div className="relative w-56 cursor-pointer" onClick={() => navigate(`/video/${video._id}`)}>
                 <img
                   src={video.thumbnail}
                   alt={video.title}
@@ -253,19 +275,21 @@ export default function Videos() {
 
               <div className="flex-1">
                 <h2 className="font-semibold text-lg">{video.title}</h2>
-                <div className="grid items-center justify-start  ">
-                  <p className="mx-start text-sm text-gray-500 mt-1">
-                  {video.views || 0} views • 
-                  
-                </p>
-                 <div onClick={()=>handleLike(video._id)} className="cursor-pointer">
-      {toggelLike ? (
-        <FaHeart className="text-2xl text-red-500 transition" />
-      ) : (
-        <FaRegHeart className="text-2xl text-gray-400 hover:text-red-400 transition" />
-      )}
-    </div></div>
-                
+                <div className="flex items-center gap-4 mt-1">
+                  <p className="text-sm text-gray-500">
+                    {video.views || 0} views
+                  </p>
+                  <div 
+                    onClick={()=>handleLike(video._id)} 
+                    className="cursor-pointer"
+                  >
+                    {likedVideos[video._id] ? (
+                      <FaHeart className="text-2xl text-red-500 transition" />
+                    ) : (
+                      <FaRegHeart className="text-2xl text-gray-400 hover:text-red-400 transition" />
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -274,6 +298,16 @@ export default function Videos() {
                   className="px-4 py-1 border rounded hover:bg-gray-100"
                 >
                   Edit
+                </button>
+                <button
+                  onClick={() => handleTogglePublish(video._id)}
+                  className={`px-4 py-1 border rounded ${
+                    video.isPublished
+                      ? "bg-green-50 text-green-600 border-green-300"
+                      : "bg-gray-50 text-gray-600"
+                  }`}
+                >
+                  {video.isPublished ? "Published" : "Unpublished"}
                 </button>
                 <button
                   onClick={() => handleDelete(video._id)}

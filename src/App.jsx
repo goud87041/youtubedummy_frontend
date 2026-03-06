@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Sidebar from "./components/Sidebar"
 import Header from "./components/Header"
+import ProtectedRoute from "./components/ProtectedRoute"
 
 import Home from "./pages/Home"
 import Videos from "./pages/Videos"
@@ -15,6 +16,9 @@ import Login from "./pages/login"
 import Register from "./pages/Register"
 import MySubscribers from "./pages/getSubscribers"
 import PlaylistVideos from "./pages/PlaylistVideos"
+import VideoPlayer from "./pages/VideoPlayer"
+import WatchHistory from "./pages/WatchHistory"
+import Dashboard from "./pages/Dashboard"
 
 export default function App() {
   return (
@@ -26,18 +30,23 @@ export default function App() {
           <main className="p-6 overflow-auto">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/tweets" element={<Tweet />} />
-              <Route path="/UserPlayLists" element={<MyPlaylist />} />
-              <Route path="/liked" element={<LikedVideos />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/subscribed-channels" element={<SubscribedChannels />}/>
-              <Route path="/channel/:channelId" element={<ChannelDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register/>}/>
-              <Route path="/subscribers" element={<MySubscribers/>}/>
-              <Route path="/playList/:playlistId" element={<PlaylistVideos/>}/>
-              <Route path="/tweets/:tweetId" element={<Tweet/>} />
+              <Route path="/video/:videoId" element={<VideoPlayer />} />
+              
+              {/* Protected Routes */}
+              <Route path="/videos" element={<ProtectedRoute><Videos /></ProtectedRoute>} />
+              <Route path="/tweets" element={<ProtectedRoute><Tweet /></ProtectedRoute>} />
+              <Route path="/UserPlayLists" element={<ProtectedRoute><MyPlaylist /></ProtectedRoute>} />
+              <Route path="/liked" element={<ProtectedRoute><LikedVideos /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/subscribed-channels" element={<ProtectedRoute><SubscribedChannels /></ProtectedRoute>}/>
+              <Route path="/channel/:channelId" element={<ChannelDetails />} />
+              <Route path="/subscribers" element={<ProtectedRoute><MySubscribers/></ProtectedRoute>}/>
+              <Route path="/playList/:playlistId" element={<ProtectedRoute><PlaylistVideos/></ProtectedRoute>}/>
+              <Route path="/tweets/:tweetId" element={<ProtectedRoute><Tweet/></ProtectedRoute>} />
+              <Route path="/history" element={<ProtectedRoute><WatchHistory /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
 
             </Routes>
