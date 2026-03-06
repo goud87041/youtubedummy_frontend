@@ -1,11 +1,11 @@
 import api from "./api";
 
 export const updateUserProfile = (data) => {
-  return api.patch("/users/update-account", data);
+  return api.post("/users/update-account", data);
 };
 
 export const updateAvatar = (data) => {
-  return api.patch("/users/avatar", data, {
+  return api.post("/users/avatar", data, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -25,7 +25,7 @@ export const changePassword = (data) => {
 };
 
 export const getUserChannelProfile = (username) => {
-  return api.get(`/users/c/${username}`);
+  return api.get(`/users/channel/${username}`);
 };
 
 export const getWatchHistory = () => {

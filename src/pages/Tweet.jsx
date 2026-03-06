@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { addTweet, allTweets, deleteTweet, updateTweet } from "../services/tweet"
 import { profileUser } from "../services/auth"
+import { likeOnTweet } from "../services/like"
+import { FaHeart, FaRegHeart } from "react-icons/fa"
 
 export default function Tweet() {
 
@@ -10,6 +12,7 @@ export default function Tweet() {
 
   const [editingId, setEditingId] = useState(null)
   const [editContent, setEditContent] = useState("")
+  const [tweetLikes, setTweetLikes] = useState({})
 
   // ================= ADD =================
   const handleTweet = async () => {
@@ -55,6 +58,19 @@ export default function Tweet() {
 
       setEditingId(null)
       setEditContent("")
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  // ================= LIKE =================
+  const handleTweetLike = async (tweetId) => {
+    try {
+      const res = await likeOnTweet(tweetId)
+      setTweetLikes(prev => ({
+        ...prev,
+        [tweetId]: res.data?.data.liked
+      }))
     } catch (error) {
       console.error(error)
     }

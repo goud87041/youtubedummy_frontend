@@ -2,10 +2,11 @@ import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import { getVideoById } from "../services/video";
-import { likeOnVideo } from "../services/like";
+import { likeOnVideo, likeOnComment } from "../services/like";
 import { getVideoComments, addComment, updateComment, deleteComment } from "../services/comment";
 import { toggleSubscribe } from "../services/subscription";
 import { ThumbsUp, Share2, Plus } from "lucide-react";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import AddToPlaylistModal from "../components/AddToPlaylistModal";
 
 export default function VideoPlayer() {
@@ -22,6 +23,7 @@ export default function VideoPlayer() {
   const [loading, setLoading] = useState(true);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editCommentText, setEditCommentText] = useState("");
+  const [commentLikes, setCommentLikes] = useState({});
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -90,6 +92,18 @@ export default function VideoPlayer() {
     try {
       await deleteComment(commentId);
       setComments(prev => prev.filter(comment => comment._id !== commentId));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleCommentLike = async (commentId) => {
+    try {
+      const res = await likeOnComment(commentId);
+      setCommentLikes(prev => ({
+        ...prev,
+        [commentId]: res.data?.data.liked
+      }));
     } catch (error) {
       console.error(error);
     }
@@ -279,25 +293,37 @@ export default function VideoPlayer() {
                   ) : (
                     <>
                       <p className="mt-1 text-sm">{comment.content}</p>
-                      {user && user.user?._id === comment.owner?._id && (
-                        <div className="flex gap-4 mt-2">
-                          <button
-                            onClick={() => {
-                              setEditingCommentId(comment._id);
-                              setEditCommentText(comment.content);
-                            }}
-                            className="text-xs text-blue-600 hover:underline"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteComment(comment._id)}
-                            className="text-xs text-red-600 hover:underline"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-4 mt-2">
+                        <button
+                          onClick={() => handleCommentLike(comment._id)}
+                          className="flex items-center gap-1 text-xs hover:text-red-500"
+                        >
+                          {commentLikes[comment._id] ? (
+                            <FaHeart className="text-red-500" />
+                          ) : (
+                            <FaRegHeart />
+                          )}
+                        </button>
+                        {user && user.user?._id === comment.owner?._id && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setEditingCommentId(comment._id);
+                                setEditCommentText(comment.content);
+                              }}
+                              className="text-xs text-blue-600 hover:underline"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteComment(comment._id)}
+                              className="text-xs text-red-600 hover:underline"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </>
                   )}
                 </div>
