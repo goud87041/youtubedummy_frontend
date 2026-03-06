@@ -1,79 +1,86 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { 
-  Home, 
-  Video, 
-  Twitter, 
-  ListMusic, 
-  Tv2, 
-  Heart, 
-  User, 
-  LogOut 
+  Home, Video, Twitter, ListMusic, Tv2, 
+  Heart, User, ChevronLeft, ChevronRight 
 } from "lucide-react";
 
 const links = [
-  { name: "Home", path: "/", icon: <Home size={20} /> },
-  { name: "Videos", path: "/videos", icon: <Video size={20} /> },
-  { name: "Tweets", path: "/tweets", icon: <Twitter size={20} /> },
-  { name: "My Playlist", path: "/UserPlayLists", icon: <ListMusic size={20} /> },
-  { name: "Subscribed", path: "/subscribed-channels", icon: <Tv2 size={20} /> },
-  { name: "Liked Videos", path: "/liked", icon: <Heart size={20} /> },
+  { name: "Home", path: "/", icon: <Home size={22} /> },
+  { name: "Videos", path: "/videos", icon: <Video size={22} /> },
+  { name: "Tweet", path: "/tweets", icon: <Twitter size={22} /> },
+  { name: "My Playlist", path: "/UserPlayLists", icon: <ListMusic size={22} /> },
+  { name: "Subscribed", path: "/subscribed-channels", icon: <Tv2 size={22} /> },
+  { name: "Liked Videos", path: "/liked", icon: <Heart size={22} /> },
 ];
 
 export default function Sidebar() {
+  const [isExpanded, setIsExpanded] = useState(true);
+
   return (
-    <aside className="flex flex-col h-screen w-64 bg-slate-950 text-slate-300 border-r border-slate-800">
-      
-      {/* 1. Header / Logo Area */}
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-          <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm">
-            DB
+    <aside 
+      className={`relative flex flex-col h-screen bg-slate-950 text-slate-300 border-r border-white/5 transition-all duration-300 ease-in-out ${
+        isExpanded ? "w-64" : "w-20"
+      }`}
+    >
+      {/* 1. Toggle Button - Floating on the edge */}
+      <button 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="absolute -right-0 top-10 w-6 h-6  bg-blue-600 rounded-full flex items-center justify-center text-white border-2 border-slate-950 hover:bg-blue-500 transition-colors z-50"
+      >
+        {isExpanded ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+      </button>
+
+      {/* 2. Logo / Branding */}
+      <div className="p-6 h-20 flex items-center overflow-hidden">
+        <div className="min-w-[32px] h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+          S
+        </div>
+        {isExpanded && (
+          <span className="ml-3 text-xl font-bold text-white tracking-tight whitespace-nowrap">
+            Streamly
           </span>
-          Dashboard
-        </h1>
+        )}
       </div>
 
-      {/* 2. Main Navigation */}
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+      {/* 3. Navigation Links */}
+      <nav className="flex-1 px-3 space-y-2 mt-4">
         {links.map((link) => (
           <NavLink
             key={link.path}
             to={link.path}
+            title={!isExpanded ? link.name : ""} // Shows tooltip when collapsed
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
-                isActive
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-900/20"
-                  : "hover:bg-slate-800 hover:text-white"
+              `flex items-center rounded-xl transition-all duration-200 group h-12 ${
+                isExpanded ? "px-4" : "justify-center px-0"
+              } ${
+                isActive ? "bg-blue-600 text-white" : "hover:bg-white/5 hover:text-white"
               }`
             }
           >
-            {/* Icon Wrapper */}
-            <span className="opacity-75 group-hover:opacity-100 transition-opacity">
-              {link.icon}
-            </span>
-            <span className="font-medium text-sm">{link.name}</span>
+            <span className="shrink-0">{link.icon}</span>
+            {isExpanded && (
+              <span className="ml-3 font-medium text-sm whitespace-nowrap opacity-100 transition-opacity duration-300">
+                {link.name}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
 
-      {/* 3. Footer / User Profile */}
-      <div className="border-t border-slate-800 p-4">
-        <NavLink
-          to="/profile"
-          className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition-colors w-full group"
-        >
-          <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white ring-2 ring-transparent group-hover:ring-blue-600 transition-all overflow-hidden">
+      {/* 4. Footer Profile Section */}
+      <div className="p-4 border-t border-white/5">
+        <div className={`flex items-center ${isExpanded ? "gap-3" : "justify-center"}`}>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-700 to-slate-800 flex items-center justify-center shrink-0">
             <User size={20} />
-            {/* If you have a profile image, use: <img src="..." className="w-full h-full object-cover" /> */}
           </div>
-          <div className="flex-1 text-left">
-            <h3 className="text-white text-sm font-semibold truncate">My Profile</h3>
-            <p className="text-slate-500 text-xs truncate">user@example.com</p>
-          </div>
-          <div className="text-slate-500 hover:text-red-400 p-2 rounded-full hover:bg-red-500/10 transition-colors">
-             <LogOut size={18} />
-          </div>
-        </NavLink>
+          {isExpanded && (
+            <div className="overflow-hidden">
+              <p className="text-sm font-semibold text-white truncate">Profile</p>
+              <p className="text-[10px] text-slate-500 uppercase tracking-tighter">View Account</p>
+            </div>
+          )}
+        </div>
       </div>
     </aside>
   );

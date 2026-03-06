@@ -1,10 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 
 export default function Profile() {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
 
   // ✅ User not logged in OR user data missing
   if (!user || !user.user) {
@@ -31,6 +34,30 @@ export default function Profile() {
   }
 
   const profile = user.user;
+
+  const handleEdit = () => {
+    setFormData({
+      fullname: profile.fullname,
+      bio: profile.bio || "",
+      avtar: profile.avtar || ""
+    });
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // Add your API call here
+      // await updateProfile(formData);
+      console.log("Saving:", formData);
+      alert("Profile updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      alert("Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -61,7 +88,7 @@ export default function Profile() {
         </div>
 
         <div className="flex items-start">
-          <button className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <button onClick={handleEdit} className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             Edit Profile
           </button>
         </div>
@@ -93,6 +120,64 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={formData.fullname}
+                  onChange={(e) => setFormData({...formData, fullname: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Bio</label>
+                <textarea
+                  value={formData.bio}
+                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                  rows="3"
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Avatar URL</label>
+                <input
+                  type="text"
+                  value={formData.avtar}
+                  onChange={(e) => setFormData({...formData, avtar: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                {loading ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                disabled={loading}
+                className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
