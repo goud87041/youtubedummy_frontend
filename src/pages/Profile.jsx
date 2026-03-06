@@ -88,7 +88,7 @@ export default function Profile() {
         </div>
 
         <div className="flex items-start">
-          <button onClick={handleEdit} className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <button onClick={handleEdit} className="px-5 py-2 bg-red-600 text-white rounded hover:bg-blue-700">
             Edit Profile
           </button>
         </div>
