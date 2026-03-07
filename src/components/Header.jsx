@@ -61,7 +61,7 @@ export default function Header() {
 
             {/* User Info & Logout */}
             <div className="flex items-center gap-3 pl-6 border-l border-white/10">
-              <div className="text-right hidden sm:block">
+              <div className="text-right hidden sm:block cursor-pointer" onClick={() => navigate("/profile")}>
                 <p className="text-sm font-semibold text-white leading-none capitalize">
                   {user.user.fullname}
                 </p>
@@ -70,7 +70,10 @@ export default function Header() {
                 </p>
               </div>
               
-              <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+              <div 
+                className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                onClick={() => navigate("/profile")}
+              >
                 <User size={18} />
               </div>
 

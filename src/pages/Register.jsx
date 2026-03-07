@@ -19,16 +19,9 @@ export default function Register() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    console.log(files);
-    if (files) {
-      // handle file input
-      
-     const avtar =   setFormData((prev) => ({ ...prev, [name]: files[0] }));
-      console.log(avtar);
-
-      console.log(formData);
-      
-      
+    
+    if (files && files.length > 0) {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -126,12 +119,13 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Avatar</label>
+            <label className="block text-sm font-medium mb-1">Avatar *</label>
             <input
               type="file"
               name="avtar"
               onChange={handleChange}
               accept="image/*"
+              required
               className="w-full"
             />
           </div>
@@ -154,6 +148,16 @@ export default function Register() {
             Register
           </button>
         </form>
+
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Already have an account?{" "}
+          <button
+            onClick={() => navigate("/login")}
+            className="text-blue-600 hover:underline font-semibold"
+          >
+            Login here
+          </button>
+        </p>
       </div>
     </div>
   );

@@ -3,25 +3,31 @@ import { getUserPlayLists, addVideoToPlaylist, removeVideoFromPlayList } from ".
 
 export default function AddToPlaylistModal({ videoId, onClose }) {
   const [playlists, setPlaylists] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
         const res = await getUserPlayLists();
-        setPlaylists(res.data.data);
+        setPlaylists(res.data.data || []);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching playlists:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchPlaylists();
   }, []);
 
   const handleTogglePlaylist = async (playlistId, isAdded) => {
-    setLoading(true);
+    setProcessing(true);
+    
     try {
       if (isAdded) {
-        await removeVideoFromPlayList(videoId, playlistId);
+        console.log('Removing video:', videoId, 'from playlist:', playlistId);
+        const res = await removeVideoFromPlayList(videoId, playlistId);
+        console.log('Remove response:', res.data);
         setPlaylists(prev =>
           prev.map(pl =>
             pl._id === playlistId
@@ -30,7 +36,9 @@ export default function AddToPlaylistModal({ videoId, onClose }) {
           )
         );
       } else {
-        await addVideoToPlaylist(videoId, playlistId);
+        console.log('Adding video:', videoId, 'to playlist:', playlistId);
+        const res = await addVideoToPlaylist(videoId, playlistId);
+        console.log('Add response:', res.data);
         setPlaylists(prev =>
           prev.map(pl =>
             pl._id === playlistId
@@ -40,9 +48,11 @@ export default function AddToPlaylistModal({ videoId, onClose }) {
         );
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error toggling playlist:", error);
+      console.error("Error details:", error.response?.data);
+      alert(`Failed to update playlist: ${error.response?.data?.message || error.message}`);
     } finally {
-      setLoading(false);
+      setProcessing(false);
     }
   };
 
@@ -60,29 +70,36 @@ export default function AddToPlaylistModal({ videoId, onClose }) {
         </div>
 
         <div className="space-y-2 max-h-96 overflow-y-auto">
-          {playlists.length === 0 ? (
+          {loading ? (
+            <p className="text-gray-500 text-center py-4">Loading playlists...</p>
+          ) : playlists.length === 0 ? (
             <p className="text-gray-500 text-center py-4">
               No playlists yet. Create one first!
             </p>
           ) : (
-            playlists.map((playlist) => (
-              <div
-                key={playlist._id}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg"
-              >
-                <div>
-                  <h3 className="font-medium">{playlist.name}</h3>
-                  <p className="text-sm text-gray-500">{playlist.description}</p>
+            playlists.map((playlist) => {
+              const isAdded = playlist.videos?.includes(videoId) || false;
+              return (
+                <div
+                  key={playlist._id}
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg"
+                >
+                  <div className="flex-1">
+                    <h3 className="font-medium">{playlist.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      {playlist.description || `${playlist.videos?.length || 0} videos`}
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isAdded}
+                    onChange={() => handleTogglePlaylist(playlist._id, isAdded)}
+                    disabled={processing}
+                    className="w-5 h-5 cursor-pointer disabled:opacity-50"
+                  />
                 </div>
-                <input
-                  type="checkbox"
-                  checked={playlist.videos?.includes(videoId) || false}
-                  onChange={() => handleTogglePlaylist(playlist._id, playlist.videos?.includes(videoId))}
-                  disabled={loading}
-                  className="w-5 h-5 cursor-pointer"
-                />
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 

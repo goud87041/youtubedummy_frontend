@@ -189,9 +189,14 @@ export default function Videos() {
 
   // ================= FORMAT DURATION =================
   const formatDuration = (seconds = 0) => {
-    const total = Math.floor(seconds);
-    const mins = Math.floor(total / 60);
-    const secs = total % 60;
+    const totalSeconds = Math.floor(seconds);
+    const hrs = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    
+    if (hrs > 0) {
+      return `${hrs}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    }
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
@@ -268,9 +273,11 @@ export default function Videos() {
                   alt={video.title}
                   className="h-32 w-full object-cover rounded-lg"
                 />
-                <span className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                  {formatDuration(video.duration)}
-                </span>
+                {video.duration > 0 && (
+                  <span className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                    {formatDuration(video.duration)}
+                  </span>
+                )}
               </div>
 
               <div className="flex-1">

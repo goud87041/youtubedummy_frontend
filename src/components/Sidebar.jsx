@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import { 
   Home, Video, Twitter, ListMusic, Tv2, 
@@ -19,6 +19,7 @@ const links = [
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   return (
     <aside 
@@ -77,7 +78,12 @@ export default function Sidebar() {
 
       {/* 4. Footer Profile Section */}
       <div className="p-4 border-t border-white/5">
-        <div className={`flex items-center ${isExpanded ? "gap-3" : "justify-center"}`}>
+        <div 
+          className={`flex items-center cursor-pointer hover:bg-white/5 rounded-xl p-2 transition-colors ${
+            isExpanded ? "gap-3" : "justify-center"
+          }`}
+          onClick={() => navigate("/profile")}
+        >
           <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-700 to-slate-800 flex items-center justify-center shrink-0">
             <User size={20} />
           </div>
