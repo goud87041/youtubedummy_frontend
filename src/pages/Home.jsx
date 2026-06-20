@@ -4,6 +4,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { AuthContext } from "../context/authContext";
 
+//add commit
+
 
 
 export default function Home() {
